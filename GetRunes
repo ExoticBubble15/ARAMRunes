@@ -1,0 +1,67 @@
+import cv2 #displaying captured image       
+import pytesseract #ocr
+from PIL import ImageGrab, Image #capturing screen
+import numpy #more displaying captured image
+from AppOpener import open #opening chrome
+import pyautogui #typing and moving mouse
+import time #irl time pausing
+
+#from stockfish import Stockfish
+#import time
+#alphabet = "abcdefghijklmnopqrstuvwxyz"
+
+while(True):
+    '''
+    #img = ImageGrab.grab(bbox=(1315, 0, 1450, 65)).convert('L') #gets percentage and converts to greyscale
+    board = ImageGrab.grab(bbox=(386, 169, 1178, 961))
+    board = numpy.array(board) #necessary for processing
+    #img = cv2.threshold(img, 50, 255, cv2.THRESH_BINARY)[1] #converts greyscale to black and white
+    cv2.imshow('board', board )
+
+    turn = ImageGrab.grab(bbox=(420, 915, 435, 930))
+    turn = numpy.array(turn)
+    turn = cv2.threshold(turn, 255/2, 255, cv2.THRESH_BINARY_INV)[1]
+    cv2.imshow('',turn)
+    '''
+
+    champ_select_chat = ImageGrab.grab(bbox=(185, 838, 546, 883)).convert('L')
+    #champ_select_chat = numpy.array(champ_select_chat)
+    #cv2.imshow('',champ_select_chat)
+    in_lobby = pytesseract.image_to_string(champ_select_chat)
+
+    if in_lobby.find("joined the lobby") != -1: 
+        lock_in_screen = ImageGrab.grab(bbox=(870, 805, 1030, 840)).convert('L')
+        #lock_in_screen = numpy.array(lock_in_screen)
+        #cv2.imshow('lock in button',lock_in_screen)
+        lock_in_text = pytesseract.image_to_string(lock_in_screen)
+        
+        if lock_in_text == "":
+            time.sleep(1)
+            champ_screen = ImageGrab.grab(bbox=(700, 630 , 1200, 678)).convert('L')
+            #champ_screen = numpy.array(champ_screen)
+            #cv2.imshow('', champ_screen)
+            #special cases: skins that directly change champ name (iBlitz, beemo, etc),
+            #champs with multiple words in name (mf, nunu, lee)
+            champ_text = pytesseract.image_to_string(champ_screen)
+            space_pos = champ_text[::-1].find(' ')
+            
+            if space_pos != -1:
+                champ_text = champ_text[len(champ_text)-space_pos:]
+            print(champ_text)
+
+            #open("chrome")
+            original_mouse_pos = pyautogui.position()
+            pyautogui.moveTo(2222, 1000)
+            pyautogui.click()
+            pyautogui.moveTo(original_mouse_pos)
+            pyautogui.hotkey('ctrl', 't')
+            link = "https://u.gg/lol/champions/aram/" + champ_text# +"-aram"
+            pyautogui.write(link)
+            pyautogui.press('enter')
+            time.sleep(3)
+            pyautogui.press('down', presses=16, interval = 0.01)
+
+            break
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
